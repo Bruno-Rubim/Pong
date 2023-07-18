@@ -10,7 +10,7 @@ let ballPosY = canvas.height/2;
 let ballRegularSpeed = 10;
 let ballSpeedX = 0;
 let ballSpeedY = 0;
-let ballRadius = 20;
+let ballRadius = 10;
 let ballColor = "#fff";
 let invisible = false;
 let ballIsStationary = true;
@@ -58,7 +58,7 @@ function barColision() {
 
 function keydownHandler(e){
     keyIsPressed[e.code] = true;
-    console.log(e.code, keyIsPressed.ControlRight);
+    console.log(e.code);
 }
 
 function keyupHandler(e){
@@ -87,8 +87,13 @@ function translateKeys(){
     } else {
         barRightSpeed = 0;
     }
-    if (keyIsPressed.Space || (keyIsPressed.ControlRight && keyIsPressed.ControlLeft)) {
+    if (keyIsPressed.Space || (keyIsPressed.ArrowRight && keyIsPressed.KeyA)) {
         if (ballIsStationary){
+            ballPosX = canvas.width/2;
+            ballPosY = canvas.height/2;
+            ballSpeedY = 0;
+            ballSpeedX = 0;
+            invisible = false;
             if(Math.random() > 0.5){
                 ballSpeedX = ballRegularSpeed;
             } else {
@@ -97,13 +102,13 @@ function translateKeys(){
             ballIsStationary = false;
         }
     }
-    if (keyIsPressed.ControlLeft) {
+    if (keyIsPressed.KeyA) {
         barLeftPosY = (canvas.height - barHeight) / 2;
         barLeftColor = "#0f7";
     } else {
         barLeftColor = "#fff";
     }
-    if (keyIsPressed.ControlRight) {
+    if (keyIsPressed.ArrowRight) {
         barRightPosY = (canvas.height - barHeight) / 2;
         barRightColor = "#0f7";
     } else {
@@ -160,15 +165,9 @@ function ballCollision(){
         ballSpeedY *= -1;
     }
     if (ballCollisionDepthLeftWall < 0) {
-        ballPosX = canvas.width/2;
-        ballPosY = canvas.height/2;
-        invisible = false;
         ballIsStationary = true;
     }
     if (ballCollisionDepthRightWall > 0) {
-        ballPosX = canvas.width/2;
-        ballPosY = canvas.height/2;
-        invisible = false;
         ballIsStationary = true;
     }
     if (!invisible) {
@@ -186,7 +185,8 @@ function ballCollision(){
             ballPosX += ballCollisionDepthRightBar*2;
             ballSpeedX *= -1;
             ballSpeedY += (barRightSpeed)* Math.random();
-        } else if (ballPosX - ballRadius < barLeftPosX + barWidth) {
+        } else if (ballPosX - ballRadius < barLeftPosX + barWidth ||
+            ballPosX + ballRadius > barRightPosX) {
             invisible = true;
         }
     }
@@ -213,6 +213,5 @@ function frame(){
     ballCollision();
     render();
     requestAnimationFrame(frame);
-    console.log(keyIsPressed.ControlRight);
 }
 frame();

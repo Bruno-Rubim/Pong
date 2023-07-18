@@ -2,6 +2,7 @@ let canvas = document.querySelector('canvas');
 let ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+let fire = document.querySelector('#fire')
 
 let keyIsPressed = {};
 
@@ -87,8 +88,8 @@ function translateKeys(){
     } else {
         barRightSpeed = 0;
     }
-    if (keyIsPressed.Space || (keyIsPressed.ArrowRight && keyIsPressed.KeyA)) {
-        if (ballIsStationary){
+    if (ballIsStationary){
+        if (keyIsPressed.ArrowRight && keyIsPressed.KeyA) {
             ballPosX = canvas.width/2;
             ballPosY = canvas.height/2;
             ballSpeedY = 0;
@@ -101,17 +102,20 @@ function translateKeys(){
             }
             ballIsStationary = false;
         }
-    }
-    if (keyIsPressed.KeyA) {
-        barLeftPosY = (canvas.height - barHeight) / 2;
-        barLeftColor = "#0f7";
+        if (keyIsPressed.KeyA) {
+            barLeftPosY = (canvas.height - barHeight) / 2;
+            barLeftColor = "#0f7";
+        } else {
+            barLeftColor = "#fff";
+        }
+        if (keyIsPressed.ArrowRight) {
+            barRightPosY = (canvas.height - barHeight) / 2;
+            barRightColor = "#0f7";
+        } else {
+            barRightColor = "#fff";
+        }
     } else {
         barLeftColor = "#fff";
-    }
-    if (keyIsPressed.ArrowRight) {
-        barRightPosY = (canvas.height - barHeight) / 2;
-        barRightColor = "#0f7";
-    } else {
         barRightColor = "#fff";
     }
 }
@@ -146,6 +150,10 @@ function ballPhysics(){
     if (ballIsStationary) {
         ballSpeedY = 0;
         ballSpeedX = 0;
+    }
+    console.log(ballSpeedY);
+    if (ballSpeedY > 22 || ballSpeedY < -22) {
+        fire.play();
     }
 }
 

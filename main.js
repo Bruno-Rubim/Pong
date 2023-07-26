@@ -2,7 +2,10 @@ let canvas = document.querySelector('canvas');
 let ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-let fire = document.querySelector('#fire')
+let paddle = document.querySelector('#paddle');
+let wall = document.querySelector('#wall');
+let score = document.querySelector('#score');
+score.loop = false;
 
 let keyIsPressed = {};
 
@@ -15,6 +18,7 @@ let ballRadius = 10;
 let ballColor = "#fff";
 let invisible = false;
 let ballIsStationary = true;
+let fast = 15;
 
 let barWidth = 20;
 let barSpeed = 1;
@@ -46,12 +50,14 @@ function barColision() {
     } else if (barLeftPosY < 0) {
         barLeftPosY = 0;
         barLeftSpeed = 0;
+        wall.play();
     }
     if (barRightPosY > canvas.height - barHeight) {
         barRightPosY = canvas.height - barHeight;
     } else if (barRightPosY < 0) {
         barRightPosY = 0;
         barRightSpeed = 0;
+        wall.play();
     }
 }
 
@@ -151,9 +157,11 @@ function ballPhysics(){
         ballSpeedY = 0;
         ballSpeedX = 0;
     }
-    console.log(ballSpeedY);
-    if (ballSpeedY > 22 || ballSpeedY < -22) {
-        fire.play();
+    if (ballSpeedY > fast || ballSpeedY < -fast) {
+        console.log("fast");
+        ballColor = "#f07";
+    } else {
+        ballColor = "#fff";
     }
 }
 
@@ -172,11 +180,13 @@ function ballCollision(){
         ballPosY -= ballCollisionDepthDown*2;
         ballSpeedY *= -1;
     }
-    if (ballCollisionDepthLeftWall < 0) {
+    if (ballCollisionDepthLeftWall < 0 && !ballIsStationary) {
         ballIsStationary = true;
+        score.play();
     }
-    if (ballCollisionDepthRightWall > 0) {
+    if (ballCollisionDepthRightWall > 0 && !ballIsStationary) {
         ballIsStationary = true;
+        score.play();
     }
     if (!invisible) {
         if (ballCollisionDepthLeftBar < 0 && 
@@ -185,6 +195,7 @@ function ballCollision(){
             ) {
             ballPosX -= ballCollisionDepthLeftBar*2;
             ballSpeedX *= -1;
+            paddle.play();
             ballSpeedY += (barLeftSpeed)* Math.random();
         } else if (ballCollisionDepthRightBar < 0 && 
             ballPosY-ballRadius < barRightPosY + barHeight &&
@@ -192,6 +203,7 @@ function ballCollision(){
             ) {
             ballPosX += ballCollisionDepthRightBar*2;
             ballSpeedX *= -1;
+            paddle.play();
             ballSpeedY += (barRightSpeed)* Math.random();
         } else if (ballPosX - ballRadius < barLeftPosX + barWidth ||
             ballPosX + ballRadius > barRightPosX) {

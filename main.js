@@ -15,7 +15,7 @@ let ballRegularSpeed = 10;
 let ballSpeedX = 0;
 let ballSpeedY = 0;
 let ballRadius = 10;
-let ballColor = "#fff";
+let ballColor = "rgb(255, 255, 255)";
 let invisible = false;
 let ballIsStationary = true;
 let fast = 15;
@@ -28,14 +28,25 @@ let barMovement = 15;
 let barLeftPosX = 50;
 let barLeftPosY = (canvas.height - barHeight) / 2;
 let barLeftSpeed = 0;
-let barLeftColor = "#0f7";
+let barLeftColor = "rgb(0, 255, 119)";
+let leftScore = 0;
 
 let barRightPosX = canvas.width - 50;
 let barRightPosY = (canvas.height - barHeight) / 2;
 let barRightSpeed = 0;
-let barRightColor = "#0f7";
+let barRightColor = "rgb(0, 255, 119)";
+let rightScore = 0;
 
 let frictionSpeed = 0.1;
+
+// Score stuff
+
+function drawScore(xDistance, yDistance, fontSize){
+    ctx.font = fontSize + "px Monospace";
+    ctx.fillStyle = "rgb(255, 255, 255)";
+    ctx.fillText(leftScore, canvas.width/2 - xDistance - fontSize/2, yDistance);
+    ctx.fillText(rightScore, canvas.width/2 + xDistance - fontSize/2, yDistance);
+}
 
 // Bar stuff
 
@@ -47,6 +58,7 @@ function drawBar(x, y, color, width, height){
 function barColision() {
     if (barLeftPosY > canvas.height - barHeight) {
         barLeftPosY = canvas.height - barHeight;
+        wall.play();
     } else if (barLeftPosY < 0) {
         barLeftPosY = 0;
         barLeftSpeed = 0;
@@ -54,6 +66,7 @@ function barColision() {
     }
     if (barRightPosY > canvas.height - barHeight) {
         barRightPosY = canvas.height - barHeight;
+        wall.play();
     } else if (barRightPosY < 0) {
         barRightPosY = 0;
         barRightSpeed = 0;
@@ -110,19 +123,19 @@ function translateKeys(){
         }
         if (keyIsPressed.KeyA) {
             barLeftPosY = (canvas.height - barHeight) / 2;
-            barLeftColor = "#0f7";
+            barLeftColor = "rgb(0, 255, 119)";
         } else {
-            barLeftColor = "#fff";
+            barLeftColor = "rgb(255, 255, 255)";
         }
         if (keyIsPressed.ArrowRight) {
             barRightPosY = (canvas.height - barHeight) / 2;
-            barRightColor = "#0f7";
+            barRightColor = "rgb(0, 255, 119)";
         } else {
-            barRightColor = "#fff";
+            barRightColor = "rgb(255, 255, 255)";
         }
     } else {
-        barLeftColor = "#fff";
-        barRightColor = "#fff";
+        barLeftColor = "rgb(255, 255, 255)";
+        barRightColor = "rgb(255, 255, 255)";
     }
 }
 
@@ -159,9 +172,9 @@ function ballPhysics(){
     }
     if (ballSpeedY > fast || ballSpeedY < -fast) {
         console.log("fast");
-        ballColor = "#f07";
+        ballColor = "rgb(255, 0, 119)";
     } else {
-        ballColor = "#fff";
+        ballColor = "rgb(255, 255, 255)";
     }
 }
 
@@ -182,10 +195,12 @@ function ballCollision(){
     }
     if (ballCollisionDepthLeftWall < 0 && !ballIsStationary) {
         ballIsStationary = true;
+        rightScore ++;
         score.play();
     }
     if (ballCollisionDepthRightWall > 0 && !ballIsStationary) {
         ballIsStationary = true;
+        leftScore ++;
         score.play();
     }
     if (!invisible) {
@@ -215,12 +230,13 @@ function ballCollision(){
 // rendering
 
 function clearCanvas(){
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = "rgb(0, 0, 0)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function render(){
     clearCanvas();
+    drawScore(300, 200, 100);
     drawBall(ballPosX, ballPosY, ballColor, ballRadius);
     drawBar(barLeftPosX, barLeftPosY, barLeftColor, barWidth, barHeight);
     drawBar(barRightPosX, barRightPosY, barRightColor, barWidth, barHeight);

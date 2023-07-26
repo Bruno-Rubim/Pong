@@ -16,6 +16,9 @@ let ballSpeedX = 0;
 let ballSpeedY = 0;
 let ballRadius = 10;
 let ballColor = "rgb(255, 255, 255)";
+let ballColorR = 255;
+let ballColorG = 255;
+let ballColorB = 255;
 let invisible = false;
 let ballIsStationary = true;
 let fast = 15;
@@ -89,6 +92,11 @@ window.addEventListener("keydown", keydownHandler);
 window.addEventListener("keyup", keyupHandler);
 
 function translateKeys(){
+    if (keyIsPressed.Minus) {
+        centerBall();
+        leftScore = 0;
+        rightScore = 0;
+    }
     if (keyIsPressed.KeyW) {
         barLeftPosY -= barMovement;
         barLeftSpeed -= barSpeed;
@@ -109,11 +117,7 @@ function translateKeys(){
     }
     if (ballIsStationary){
         if (keyIsPressed.ArrowRight && keyIsPressed.KeyA) {
-            ballPosX = canvas.width/2;
-            ballPosY = canvas.height/2;
-            ballSpeedY = 0;
-            ballSpeedX = 0;
-            invisible = false;
+            centerBall();
             if(Math.random() > 0.5){
                 ballSpeedX = ballRegularSpeed;
             } else {
@@ -141,6 +145,21 @@ function translateKeys(){
 
 // ball stuff
 
+// function ballSpeedCalculator(){
+//     return (ballSpeedX**2 + ballSpeedY**2)**0.5;
+// }
+
+// function addFriction(){
+//     let speed = ballSpeedCalculator();
+//     if (speed >= frictionSpeed){
+//         ballSpeedX -= (ballSpeedX / speed)*frictionSpeed;
+//         ballSpeedY -= (ballSpeedY / speed)*frictionSpeed;
+//     } else {
+//         ballSpeedX = 0;
+//         ballSpeedY = 0;
+//     }
+// }
+
 function drawBall(x, y, color, radius){
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2*Math.PI);
@@ -148,19 +167,40 @@ function drawBall(x, y, color, radius){
     ctx.fill();
 }
 
-function ballSpeedCalculator(){
-    return (ballSpeedX**2 + ballSpeedY**2)**0.5;
+function changeBallColor(type, R, G, B) {
+    if (type == "gradual") {
+        if (ballColorR < R) {
+            ballColorR++;
+        } else if (ballColorR > R) {
+            ballColorR--;
+        }
+        if (ballColorG < G) {
+            ballColorG++;
+        } else if (ballColorG > G) {
+            ballColorG--;
+        }
+        if (ballColorB < B) {
+            ballColorB++;
+        } else if (ballColorB > B) {
+            ballColorB--;
+        }
+    } else {
+        ballColorR = R;
+        ballColorG = G;
+        ballColorB = B;
+    }
+    ballColor = "rgb(" + ballColorR + ", " + ballColorG + ", " + ballColorB + ")";
+    console.log(ballColor);
 }
 
-function addFriction(){
-    let speed = ballSpeedCalculator();
-    if (speed >= frictionSpeed){
-        ballSpeedX -= (ballSpeedX / speed)*frictionSpeed;
-        ballSpeedY -= (ballSpeedY / speed)*frictionSpeed;
-    } else {
-        ballSpeedX = 0;
-        ballSpeedY = 0;
-    }
+function centerBall() {
+    ballPosX = canvas.width/2;
+    ballPosY = canvas.height/2;
+    ballSpeedY = 0;
+    ballSpeedX = 0;
+    invisible = false;
+    ballIsStationary = true;
+    changeBallColor("instant", 255, 255, 255);
 }
 
 function ballPhysics(){
@@ -172,9 +212,9 @@ function ballPhysics(){
     }
     if (ballSpeedY > fast || ballSpeedY < -fast) {
         console.log("fast");
-        ballColor = "rgb(255, 0, 119)";
+        changeBallColor("instant", 255, 0, 119);
     } else {
-        ballColor = "rgb(255, 255, 255)";
+        changeBallColor("gradual", 255, 255, 255);
     }
 }
 
@@ -205,25 +245,36 @@ function ballCollision(){
     }
     if (!invisible) {
         if (ballCollisionDepthLeftBar < 0 && 
-            ballPosY-ballRadius < barLeftPosY + barHeight &&
-            ballPosY+ballRadius > barLeftPosY
-            ) {
+        ballPosY-ballRadius < barLeftPosY + barHeight &&
+        ballPosY+ballRadius > barLeftPosY
+        ) {
             ballPosX -= ballCollisionDepthLeftBar*2;
             ballSpeedX *= -1;
             paddle.play();
             ballSpeedY += (barLeftSpeed)* Math.random();
         } else if (ballCollisionDepthRightBar < 0 && 
-            ballPosY-ballRadius < barRightPosY + barHeight &&
-            ballPosY+ballRadius > barRightPosY
-            ) {
+        ballPosY-ballRadius < barRightPosY + barHeight &&
+        ballPosY+ballRadius > barRightPosY
+        ) {
             ballPosX += ballCollisionDepthRightBar*2;
             ballSpeedX *= -1;
             paddle.play();
             ballSpeedY += (barRightSpeed)* Math.random();
         } else if (ballPosX - ballRadius < barLeftPosX + barWidth ||
-            ballPosX + ballRadius > barRightPosX) {
+        ballPosX + ballRadius > barRightPosX) {
             invisible = true;
         }
+    }
+}
+
+// blocks
+
+function addBlock (type) {
+    switch(type){
+        case 'blank':
+        default:
+            
+            break;
     }
 }
 

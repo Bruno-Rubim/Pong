@@ -5,7 +5,8 @@ canvas.height = window.innerHeight;
 let paddle = document.querySelector('#paddle');
 let wall = document.querySelector('#wall');
 let score = document.querySelector('#score');
-score.loop = false;
+
+blocks = [];
 
 let keyIsPressed = {};
 
@@ -92,7 +93,7 @@ window.addEventListener("keydown", keydownHandler);
 window.addEventListener("keyup", keyupHandler);
 
 function translateKeys(){
-    if (keyIsPressed.Minus) {
+    if (keyIsPressed.Minus || keyIsPressed.NumpadSubtract) {
         centerBall();
         leftScore = 0;
         rightScore = 0;
@@ -106,17 +107,17 @@ function translateKeys(){
     } else {
         barLeftSpeed = 0;
     }
-    if (keyIsPressed.ArrowUp) {
+    if (keyIsPressed.ArrowUp || keyIsPressed.Numpad8) {
         barRightPosY -= barMovement;
         barRightSpeed -= barSpeed;
-    } else if (keyIsPressed.ArrowDown) {
+    } else if (keyIsPressed.ArrowDown || keyIsPressed.Numpad5) {
         barRightPosY += barMovement;
         barRightSpeed += barSpeed;
     } else {
         barRightSpeed = 0;
     }
     if (ballIsStationary){
-        if (keyIsPressed.ArrowRight && keyIsPressed.KeyA) {
+        if ((keyIsPressed.ArrowRight || keyIsPressed.Numpad6) && keyIsPressed.KeyA) {
             centerBall();
             if(Math.random() > 0.5){
                 ballSpeedX = ballRegularSpeed;
@@ -131,7 +132,7 @@ function translateKeys(){
         } else {
             barLeftColor = "rgb(255, 255, 255)";
         }
-        if (keyIsPressed.ArrowRight) {
+        if (keyIsPressed.ArrowRight || keyIsPressed.Numpad6) {
             barRightPosY = (canvas.height - barHeight) / 2;
             barRightColor = "rgb(0, 255, 119)";
         } else {
@@ -190,7 +191,6 @@ function changeBallColor(type, R, G, B) {
         ballColorB = B;
     }
     ballColor = "rgb(" + ballColorR + ", " + ballColorG + ", " + ballColorB + ")";
-    console.log(ballColor);
 }
 
 function centerBall() {
@@ -269,12 +269,24 @@ function ballCollision(){
 
 // blocks
 
-function addBlock (type) {
+function addBlock (type, x, y) {
+    let newBlock = {type: type, posX: x, posY: y};
     switch(type){
         case 'blank':
         default:
-            
+            newBlock.colorR = 255;
+            newBlock.colorG = 255;
+            newBlock.colorB = 255;
             break;
+    }
+    newBlock.color = "rgb(" + newBlock.colorR + ", " + newBlock.colorG + ", " + newBlock.colorB + ")";
+    blocks.push(newBlock);
+}
+
+function drawBlocks(){
+    for(let i = 0; i < blocks.length; i++){
+        ctx.fillStyle = blocks[i].color;
+        ctx.fillRect(blocks[i].posX, blocks[i].posY, 50, 50);
     }
 }
 
@@ -288,6 +300,7 @@ function clearCanvas(){
 function render(){
     clearCanvas();
     drawScore(300, 200, 100);
+    drawBlocks();
     drawBall(ballPosX, ballPosY, ballColor, ballRadius);
     drawBar(barLeftPosX, barLeftPosY, barLeftColor, barWidth, barHeight);
     drawBar(barRightPosX, barRightPosY, barRightColor, barWidth, barHeight);
@@ -300,5 +313,6 @@ function frame(){
     ballCollision();
     render();
     requestAnimationFrame(frame);
+    console.log(ballSpeedY);
 }
 frame();
